@@ -3,11 +3,10 @@ package main
 import (
 	"flag"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"strings"
-
-	// "runtime/debug"
 
 	ignore "github.com/sabhiram/go-gitignore"
 )
@@ -51,16 +50,17 @@ func main() {
 	}
 
 	fmt.Println(root)
-	printTree(root, root, "", ignoreObject, 0)
+	printTree(root, root, "", ignoreObject, 0, os.Stdout)
 }
 
-// printTree recorre los directorios recursivamente
+// printTree loop the directories recursively
 func printTree(
 	basePath string,
 	currentPath string,
 	prefix string,
 	ignoreObj *ignore.GitIgnore,
-	currentDepth int) {
+	currentDepth int,
+	writer io.Writer) {
 	if maxDepth > 0 && currentDepth >= maxDepth {
 		return
 	}
@@ -101,7 +101,12 @@ func printTree(
 			connector = "└── "
 		}
 
-		fmt.Printf("%s%s%s\n", prefix, connector, entry.Name())
+		sufix := ""
+		if entry.IsDir() {
+			sufix = "/"
+		}
+
+		fmt.Fprintf(writer, "%s%s%s%s\n", prefix, connector, entry.Name(), sufix)
 
 		if entry.IsDir() {
 			newPrefix := prefix
@@ -113,7 +118,7 @@ func printTree(
 
 			subPath := filepath.Join(currentPath, entry.Name())
 
-			printTree(basePath, subPath, newPrefix, ignoreObj, currentDepth+1)
+			printTree(basePath, subPath, newPrefix, ignoreObj, currentDepth+1, writer)
 		}
 	}
 }
