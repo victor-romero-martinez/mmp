@@ -25,11 +25,11 @@ func main() {
 
 	flag.Parse()
 
-	root := "."
+	root := "./"
 
 	positionalArgs := flag.Args()
 	if len(positionalArgs) > 0 {
-		root = positionalArgs[0]
+		root = positionalArgs[0] + "/"
 	}
 
 	var ignoreObject *ignore.GitIgnore
