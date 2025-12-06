@@ -115,12 +115,12 @@ func printTree(
 			connector = "└── "
 		}
 
-		sufix := ""
+		suffix := ""
 		if entry.IsDir() {
-			sufix = "/"
+			suffix = "/"
 		}
 
-		fmt.Fprintf(writer, "%s%s%s%s\n", prefix, connector, entry.Name(), sufix)
+		fmt.Fprintf(writer, "%s%s%s%s\n", prefix, connector, entry.Name(), suffix)
 
 		if entry.IsDir() {
 			newPrefix := prefix
