@@ -25,11 +25,11 @@ func main() {
 
 	flag.Parse()
 
-	root := "./"
+	root := "."
 
 	positionalArgs := flag.Args()
 	if len(positionalArgs) > 0 {
-		root = positionalArgs[0] + "/"
+		root = positionalArgs[0]
 	}
 
 	if showVersion {
@@ -58,7 +58,12 @@ func main() {
 		}
 	}
 
-	fmt.Println(root)
+	displayRoot := root
+	if !strings.HasSuffix(displayRoot, "/") {
+		displayRoot += "/"
+	}
+
+	fmt.Fprintf(os.Stdout, "%s\n", displayRoot)
 	printTree(root, root, "", ignoreObject, 0, os.Stdout)
 }
 
