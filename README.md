@@ -1,3 +1,7 @@
+<p align="center">
+<img src="./assets/shots.png" width=500 />
+</p>
+
 # 🌳 MMP: Map My Project
 
 MMP es una herramienta CLI de línea de comandos rápida y moderna escrita en **Go (Golang)**, inspirada en el comando `tree` de Unix. Permite visualizar la estructura de directorios de cualquier proyecto de forma recursiva, ofreciendo control avanzado sobre la profundidad y el filtrado.
@@ -19,3 +23,4 @@ Para compilar y crear el ejecutable `mmp` en tu sistema:
 ```bash
 # 1. Asegúrate de estar en el directorio raíz de tu proyecto
 go build -o mmp main.go
+```
