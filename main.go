@@ -32,6 +32,20 @@ func main() {
 		root = positionalArgs[0] + "/"
 	}
 
+	if showVersion {
+		fmt.Println("version: ", version)
+		return
+	}
+
+	if _, err := os.Stat(root); err != nil {
+		if os.IsNotExist(err) {
+			fmt.Fprintf(os.Stderr, "Error: The path '%s' does not exist.\n", root)
+		} else {
+			fmt.Fprintf(os.Stderr, "Error accessing path '%s': %v\n", root, err)
+		}
+		os.Exit(1)
+	}
+
 	var ignoreObject *ignore.GitIgnore
 
 	gitIgnorePath := filepath.Join(root, ".gitignore")
@@ -42,11 +56,6 @@ func main() {
 		} else {
 			ignoreObject = object
 		}
-	}
-
-	if showVersion {
-		fmt.Println("version: ", version)
-		return
 	}
 
 	fmt.Println(root)
