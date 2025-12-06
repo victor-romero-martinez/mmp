@@ -21,6 +21,7 @@ func TestPrintTree_FilteringAndDepth(t *testing.T) {
 	tempDir := t.TempDir()
 
 	// tempDir/
+	// ├── .gitignore
 	// ├── file.txt
 	// ├── .hidden_file
 	// ├── node_modules/ (Ignorado por Git)
@@ -71,6 +72,7 @@ func TestPrintTree_FilteringAndDepth(t *testing.T) {
 			expectedContains:    "src/",
 			expectedNotContains: "index.go",
 		},
+		{},
 	}
 
 	for _, tt := range tests {
