@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"strings"
@@ -44,6 +45,7 @@ func TestPrintTree_FilteringAndDepth(t *testing.T) {
 		name                string
 		maxDepth            int
 		showHidden          bool
+		directoriesOnly     bool
 		expectedLines       int
 		expectedContains    string
 		expectedNotContains string
@@ -52,7 +54,8 @@ func TestPrintTree_FilteringAndDepth(t *testing.T) {
 			name:                "Defecto_sin_flags",
 			maxDepth:            0,
 			showHidden:          false,
-			expectedLines:       6,
+			directoriesOnly:     false,
+			expectedLines:       4,
 			expectedContains:    "file.txt",
 			expectedNotContains: ".hidden_file",
 		},
@@ -60,26 +63,36 @@ func TestPrintTree_FilteringAndDepth(t *testing.T) {
 			name:                "Mostrar_Ocultos_-a",
 			maxDepth:            0,
 			showHidden:          true,
-			expectedLines:       7,
+			directoriesOnly:     false,
+			expectedLines:       6,
 			expectedContains:    ".hidden_file",
 			expectedNotContains: "node_modules",
+		},
+		{
+			name:                "Solo_Directorios_-d",
+			maxDepth:            0,
+			showHidden:          false,
+			directoriesOnly:     true,
+			expectedLines:       2,
+			expectedContains:    "src/",
+			expectedNotContains: "file.txt",
 		},
 		{
 			name:                "Límite_Profundidad_-L_1",
 			maxDepth:            1,
 			showHidden:          false,
+			directoriesOnly:     false,
 			expectedLines:       3,
 			expectedContains:    "src/",
-			expectedNotContains: "index.go",
+			expectedNotContains: "index.txt",
 		},
-		{},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			maxDepth = tt.maxDepth
 			showHidden = tt.showHidden
-			directoriesOnly = false
+			directoriesOnly = tt.directoriesOnly
 
 			output := captureStdout(t, func(buf *bytes.Buffer) {
 				fmt.Fprintf(buf, "%s\n", tempDir)
@@ -94,13 +107,44 @@ func TestPrintTree_FilteringAndDepth(t *testing.T) {
 				t.Errorf("FAIL: La salida contiene la cadena NO esperada '%s'. Salida:\n%s", tt.expectedNotContains, output)
 			}
 
-			if tt.maxDepth == 1 {
-				lines := strings.Split(strings.TrimSpace(output), "\n")
-				actualLines := len(lines)
-				if len(lines) != tt.expectedLines {
-					t.Errorf("FAIL: Se espraba %d linesa, se obtuvo %d. Salida:\n%s", tt.expectedLines, actualLines, output)
-				}
+			lines := strings.Split(strings.TrimSpace(output), "\n")
+			actualLines := len(lines)
+			if len(lines) != tt.expectedLines {
+				t.Errorf("FAIL: Se espraba %d lineas, se obtuvo %d. Salida:\n%s", tt.expectedLines, actualLines, output)
 			}
 		})
+	}
+}
+
+func Test_PathNotExist(t *testing.T) {
+	originalExit := exitFunc
+	defer func() { exitFunc = originalExit }()
+
+	var exitCode int
+	exitFunc = func(code int) {
+		exitCode = code
+	}
+
+	oldStderr := os.Stderr
+	r, w, _ := os.Pipe()
+	os.Stderr = w
+
+	os.Args = []string{"cmd", "ruta_que_no_existe_123"}
+	main()
+
+	w.Close()
+	os.Stderr = oldStderr
+
+	var buf bytes.Buffer
+	io.Copy(&buf, r)
+
+	output := buf.String()
+
+	if !strings.Contains(output, "does not exist") {
+		t.Errorf("Se esperaba mensaje de path inexistente, pero se obtuvo:\n%s", output)
+	}
+
+	if exitCode != 1 {
+		t.Errorf("Se esperaba exit code 1, pero se obtuvo %d", exitCode)
 	}
 }
