@@ -17,6 +17,8 @@ var directoriesOnly bool
 var showVersion bool
 var version string
 
+var exitFunc = os.Exit
+
 func main() {
 	flag.IntVar(&maxDepth, "L", 0, "Limit the depth of the tree (0 means no limit).")
 	flag.BoolVar(&showHidden, "a", false, "Show all files, including hidden ones (starting with a dot).")
@@ -43,7 +45,7 @@ func main() {
 		} else {
 			fmt.Fprintf(os.Stderr, "Error accessing path '%s': %v\n", root, err)
 		}
-		os.Exit(1)
+		exitFunc(1)
 	}
 
 	var ignoreObject *ignore.GitIgnore
