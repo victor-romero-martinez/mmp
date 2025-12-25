@@ -1,3 +1,7 @@
+<p align="center">
+<img src="./assets/shots.png" width=500 />
+</p>
+
 # 🌳 MMP: Map My Project
 
 **MMP** es una herramienta de línea de comandos (CLI) moderna y ultrarrápida escrita en **Go**, inspirada en el clásico comando `tree`. Está diseñada para ayudarte a visualizar estructuras de directorios complejas con control total sobre lo que deseas ver.
